@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RHCE EX294 · Performance-Based Practice Examination</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23EE0000'/%3E%3Ctext x='16' y='21' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='white'%3ERH%3C/text%3E%3C/svg%3E">
+<style>
+/* =============================================================
+   RHCE EX294 practice examination — theme tokens
+   Independent practice simulator; not an official Red Hat exam.
+   ============================================================= */
+:root{
+  --rh-red:#EE0000;
+  --rh-red-dark:#B80000;
+  --rh-red-tint:#FCEBEB;
+  --ink:#151515;
+  --ink-soft:#3C3C3C;
+  --ink-muted:#5E5E5E;
+  --bg:#F5F5F5;
+  --panel:#FFFFFF;
+  --panel-alt:#FAFAFA;
+  --border:#D2D2D2;
+  --border-soft:#E6E6E6;
+  --success:#1F7A3D;
+  --success-bg:#EAF4EC;
+  --warning:#8A5A00;
+  --warning-bg:#FFF5E2;
+  --font-sans:"Red Hat Display","Red Hat Text",Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"Red Hat Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+  --header-height:76px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--ink);font:14px/1.55 var(--font-sans);-webkit-font-smoothing:antialiased}
+button,input,summary{font:inherit}
+.hidden{display:none!important}
+:focus-visible{outline:2px solid var(--rh-red);outline-offset:2px}
+
+/* ---------- Buttons ---------- */
+.btn{border:1px solid var(--border);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:2px;font-size:12px;font-weight:700;letter-spacing:.01em;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--ink-muted);background:var(--panel-alt)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:var(--rh-red);border-color:var(--rh-red);color:#fff}
+.btn-primary:hover{background:var(--rh-red-dark);border-color:var(--rh-red-dark)}
+.btn-danger{background:var(--rh-red);border-color:var(--rh-red);color:#fff}
+.btn-danger:hover{background:var(--rh-red-dark);border-color:var(--rh-red-dark)}
+.btn-quiet{background:transparent;border-color:transparent;color:var(--ink-muted)}
+.btn-quiet:hover{background:var(--panel-alt);border-color:var(--border-soft);color:var(--ink)}
+.btn-outline-red{border-color:var(--rh-red);color:var(--rh-red);background:transparent}
+.btn-outline-red:hover{background:var(--rh-red-tint);border-color:var(--rh-red)}
+.btn-lg{padding:12px 22px;font-size:13px}
+
+/* ---------- Persistent exam header ---------- */
+.exam-header{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 24px;min-height:76px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.brand-block{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;background:var(--rh-red);color:#fff;font-size:13px;font-weight:800;letter-spacing:.04em;border-radius:2px}
+.brand-text{min-width:0}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-muted)}
+.brand-text h1{margin:1px 0 0;font-size:17px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}
+.brand-text .subtitle{font-size:11px;color:var(--ink-muted);white-space:nowrap}
+.header-meta{display:flex;align-items:center;gap:0;margin-left:auto}
+.meta-item{padding:0 16px;border-left:1px solid var(--border-soft)}
+.meta-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+.meta-value{margin-top:2px;font-size:12px;font-weight:700;white-space:nowrap}
+.timer-value{font-family:var(--font-mono);font-size:19px;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.timer-value.warn{color:var(--warning)}
+.timer-value.danger{color:var(--rh-red)}
+.status-badge{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--panel-alt);padding:4px 8px;border-radius:2px;font-size:10px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--rh-red)}
+.status-badge.is-idle .status-dot{background:#9A9A9A}
+.status-badge.is-done .status-dot{background:var(--success)}
+.status-badge.is-paused .status-dot{background:var(--warning)}
+.header-actions{display:flex;align-items:center;gap:6px;padding-left:14px;border-left:1px solid var(--border-soft)}
+
+/* ---------- Screens ---------- */
+.screen{flex:1 1 auto;min-height:0}
+.overview-screen,.complete-screen{overflow:auto;padding:28px}
+.exam-screen{overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:14px 16px 16px}
+.panel{background:var(--panel);border:1px solid var(--border);min-height:0}
+
+/* ---------- Overview ---------- */
+.overview{max-width:1080px;margin:12px auto 40px}
+.doc-header{background:var(--panel);border:1px solid var(--border);border-top:4px solid var(--rh-red);padding:28px 32px}
+.doc-header .eyebrow{color:var(--rh-red)}
+.doc-header h2{margin:8px 0 6px;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.doc-header p{margin:0;max-width:760px;color:var(--ink-muted);font-size:13px}
+.overview-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;background:var(--panel);border:1px solid var(--border);border-top:0}
+.overview-main{padding:26px 32px 30px;border-right:1px solid var(--border-soft)}
+.overview-side{padding:26px 24px;background:var(--panel-alt)}
+.fact-list{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;margin:0;border-top:1px solid var(--border-soft)}
+.fact{padding:12px 0;border-bottom:1px solid var(--border-soft)}
+.fact dt{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+.fact dd{margin:3px 0 0;font-size:13px;font-weight:700}
+.instructions{margin-top:26px}
+.instructions h3,.candidate-card h3{margin:0 0 10px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.instructions ol{margin:0;padding-left:22px;color:var(--ink-soft)}
+.instructions li{padding:5px 0;font-size:13px}
+.instructions li::marker{font-family:var(--font-mono);font-size:11px;color:var(--rh-red);font-weight:700}
+.candidate-card{border:1px solid var(--border);background:var(--panel);padding:18px}
+.field-label{display:block;margin-bottom:6px;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+.name-field input{width:100%;border:1px solid var(--border);border-radius:2px;background:var(--panel);color:var(--ink);padding:9px 10px;font-size:13px}
+.name-field input:focus{outline:none;border-color:var(--rh-red);box-shadow:0 0 0 2px var(--rh-red-tint)}
+.name-field.invalid input{border-color:var(--rh-red)}
+.field-hint,.field-error{margin:6px 0 0;font-size:11px;line-height:1.4}
+.field-hint{color:var(--ink-muted)}
+.field-error{color:var(--rh-red);font-weight:700}
+.candidate-card .mini-list{margin:14px 0 0}
+.candidate-card .mini-list div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--border-soft);font-size:12px}
+.candidate-card .mini-list dt{color:var(--ink-muted)}
+.candidate-card .mini-list dd{margin:0;font-weight:700}
+.start-box{margin-top:18px;border:1px solid var(--border);background:var(--panel);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.start-box p{margin:0;font-size:12px;color:var(--ink-muted);max-width:520px}
+.notice-block{border-left:3px solid var(--warning);background:var(--warning-bg);color:#594100;padding:11px 14px;font-size:12px;line-height:1.5}
+.notice-block.neutral{border-left-color:var(--border);background:var(--panel-alt);color:var(--ink-muted)}
+.overview .notice-block{margin-top:18px}
+
+/* ---------- Exam workspace grid ---------- */
+.exam-grid{display:grid;grid-template-columns:258px minmax(0,1fr) 320px;gap:12px;flex:1;min-height:0}
+details>summary{list-style:none;cursor:default}
+details>summary::-webkit-details-marker{display:none}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 15px;border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--panel)}
+.panel-head .panel-hint{font-size:10px;color:var(--ink-muted);font-weight:700;letter-spacing:.06em}
+.collapse-icon{display:none;color:var(--ink-muted);font-size:14px;line-height:1}
+/* Chrome does not flex the children of <details> reliably, so the content
+   wrapper gets an explicit height and manages its own flex/scroll area. */
+.nav-panel>details,.checklist-panel>details{height:100%;overflow:hidden}
+.nav-content,.checklist-content{height:calc(100% - 44px);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+details:not([open])>.nav-content,details:not([open])>.checklist-content{display:none}
+
+/* ---------- Left: task navigation ---------- */
+.nav-tools{padding:12px;border-bottom:1px solid var(--border-soft)}
+.search-input{width:100%;border:1px solid var(--border);border-radius:2px;background:var(--panel);color:var(--ink);padding:8px 10px;font-size:12px}
+.search-input::placeholder{color:#8A8A8A}
+.filter-row{display:flex;gap:5px;margin-top:8px}
+.filter-chip{border:1px solid var(--border);background:var(--panel);color:var(--ink-muted);font-size:10px;font-weight:700;padding:5px 8px;border-radius:2px;cursor:pointer}
+.filter-chip:hover{border-color:var(--ink-muted)}
+.filter-chip.active{background:var(--rh-red-tint);border-color:var(--rh-red);color:var(--rh-red-dark)}
+.nav-list{flex:1;min-height:0;overflow:auto;padding:4px 0;max-height:calc(100vh - 360px)}
+.nav-item{display:grid;grid-template-columns:26px minmax(0,1fr) auto;align-items:center;gap:8px;width:100%;text-align:left;border:0;border-left:3px solid transparent;border-bottom:1px solid var(--border-soft);background:transparent;padding:10px 11px;cursor:pointer;color:var(--ink)}
+.nav-item:hover{background:var(--panel-alt)}
+.nav-item.current{border-left-color:var(--rh-red);background:var(--rh-red-tint)}
+.nav-num{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-muted)}
+.nav-item.current .nav-num{color:var(--rh-red)}
+.nav-main{min-width:0}
+.nav-title{display:block;font-size:12px;font-weight:650;line-height:1.3}
+.nav-sub{display:block;margin-top:2px;font-size:10px;color:var(--ink-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-points{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--ink-muted);white-space:nowrap}
+.state-mark{display:inline-block;width:7px;height:7px;margin-right:5px;border-radius:50%;background:#A8A8A8;vertical-align:1px}
+.state-mark.progress{background:var(--rh-red)}
+.state-mark.done{width:auto;height:auto;background:none;color:var(--success);font-size:11px;font-weight:800;vertical-align:0}
+.nav-footer{padding:12px 14px;border-top:1px solid var(--border);background:var(--panel-alt)}
+.progress-label{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted)}
+.progress-label strong{color:var(--ink);font-variant-numeric:tabular-nums}
+.progress-track{height:6px;margin-top:8px;background:#E4E4E4;overflow:hidden}
+.progress-fill{height:100%;width:0;background:var(--rh-red);transition:width .16s linear}
+.nav-footnote{margin-top:7px;font-size:10px;color:var(--ink-muted)}
+
+/* ---------- Center: technical instructions ---------- */
+.instructions-panel{display:flex;flex-direction:column;overflow:hidden}
+.instructions-scroll{flex:1;min-height:0;overflow:auto;padding:24px 30px 42px}
+.task-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.task-kicker{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--rh-red)}
+.task-title{margin:6px 0 0;font-size:23px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.task-overview{margin-top:16px;padding:15px 18px;border:1px solid var(--border);border-left:3px solid var(--rh-red);background:var(--panel-alt)}
+.task-overview .eyebrow{color:var(--rh-red)}
+.task-overview p{margin:6px 0 0;max-width:920px;font-size:14px;line-height:1.65;color:var(--ink-soft)}
+.task-points{flex:0 0 auto;text-align:right;border-left:1px solid var(--border-soft);padding-left:18px}
+.task-points strong{display:block;font-family:var(--font-mono);font-size:24px;line-height:1}
+.task-points span{display:block;margin-top:4px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted)}
+.meta-strip{display:flex;flex-wrap:wrap;gap:22px;margin-top:14px;padding:12px 16px;background:var(--panel-alt);border:1px solid var(--border-soft)}
+.meta-strip div span{display:block;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted)}
+.meta-strip div strong{display:block;margin-top:2px;font-size:12px}
+.section-title{margin:24px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--border);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+.requirement-list{list-style:none;margin:0;padding:0}
+.requirement{display:grid;grid-template-columns:34px minmax(0,1fr) 18px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--border-soft);font-size:14px;line-height:1.6;color:var(--ink-soft)}
+.req-index{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-muted);padding-top:3px}
+.req-body{min-width:0}
+.requirement.checked{color:var(--ink-muted)}
+.req-check{font-size:12px;font-weight:800;color:var(--success);padding-top:2px}
+code{font-family:var(--font-mono);font-size:.92em;background:#F1F1F1;border:1px solid var(--border-soft);border-radius:2px;padding:1px 4px;color:#8A1B00;word-break:break-word}
+pre.reference-block{margin:0;padding:12px 14px;background:#F7F7F7;border:1px solid var(--border-soft);font-family:var(--font-mono);font-size:11px;line-height:1.8;color:var(--ink-soft);white-space:pre-wrap;word-break:break-word}
+.ref-details{margin-top:12px;border:1px solid var(--border-soft)}
+.ref-details>summary{cursor:pointer;padding:9px 12px;font-size:11px;font-weight:750;color:var(--ink-muted);background:var(--panel-alt)}
+.ref-details[open]>summary{border-bottom:1px solid var(--border-soft)}
+.notes-stack{display:grid;gap:8px}
+.review-note{margin-bottom:16px;border-left:3px solid var(--rh-red);background:var(--rh-red-tint);padding:11px 14px;font-size:12px;color:#7A1010}
+
+/* ---------- Right: checklist ---------- */
+.checklist-panel{display:flex;flex-direction:column;overflow:hidden}
+.checklist-block{padding:16px;border-bottom:1px solid var(--border-soft)}
+.check-topline{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.check-topline .section-title{margin:0;padding:0;border:0}
+.points-badge{font-family:var(--font-mono);font-size:11px;font-weight:700;border:1px solid var(--border);padding:2px 7px}
+.progress-number{display:flex;align-items:baseline;gap:8px;margin-top:12px}
+.progress-number strong{font-family:var(--font-mono);font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.progress-number span{font-size:11px;color:var(--ink-muted)}
+.check-meta{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:10px;color:var(--ink-muted)}
+.check-list{flex:1;min-height:0;overflow:auto;padding:4px 16px}
+.check-item{display:grid;grid-template-columns:17px 24px minmax(0,1fr);gap:8px;align-items:start;padding:11px 0;border-bottom:1px solid var(--border-soft);cursor:pointer}
+.check-item:hover{background:var(--panel-alt)}
+.check-item input{width:15px;height:15px;margin:2px 0 0;accent-color:var(--rh-red);cursor:pointer}
+.check-item input:disabled{cursor:default}
+.check-index{font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);padding-top:2px}
+.check-text{font-size:12px;line-height:1.5;color:var(--ink-soft)}
+.check-item.done .check-text{color:var(--ink-muted)}
+.check-nav{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--panel-alt)}
+.check-nav .btn{flex:1}
+.checklist-readonly{padding:10px 16px;border-bottom:1px solid var(--border-soft);font-size:11px;color:var(--warning);background:var(--warning-bg)}
+
+/* ---------- Review bar ---------- */
+.review-bar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--rh-red);padding:10px 14px;font-size:12px}
+.review-bar strong{font-weight:800}
+.review-bar span{color:var(--ink-muted)}
+.review-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- Completion summary ---------- */
+.summary{max-width:1040px;margin:12px auto 40px}
+.summary-hero{background:var(--panel);border:1px solid var(--border);border-top:4px solid var(--rh-red);padding:26px 30px}
+.summary-hero h2{margin:7px 0 6px;font-size:25px;letter-spacing:-.02em}
+.summary-hero p{margin:0;color:var(--ink-muted);font-size:13px}
+.result-line{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border-soft)}
+.result-line span{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+.result-line strong{font-size:20px;letter-spacing:.02em;color:var(--rh-red)}
+.summary-hero.is-pass .result-line strong{color:var(--success)}
+.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--border);border-top:0;background:var(--panel)}
+.summary-stat{padding:18px 20px;border-right:1px solid var(--border-soft)}
+.summary-stat:last-child{border-right:0}
+.summary-stat span{display:block;font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-muted)}
+.summary-stat strong{display:block;margin-top:6px;font-family:var(--font-mono);font-size:20px;font-weight:700}
+.summary .notice-block{margin-top:14px}
+.summary-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.summary-table-wrap{margin-top:22px;background:var(--panel);border:1px solid var(--border)}
+.summary-table-wrap h3{margin:0;padding:13px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.summary-table{width:100%;border-collapse:collapse;font-size:12px}
+.summary-table th,.summary-table td{text-align:left;padding:8px 16px;border-bottom:1px solid var(--border-soft)}
+.summary-table th{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);font-weight:800;background:var(--panel-alt)}
+.summary-table td:last-child,.summary-table th:last-child{text-align:right;font-family:var(--font-mono);white-space:nowrap}
+.summary-table tr:last-child td{border-bottom:0}
+
+/* ---------- Confirmation dialog ---------- */
+.modal-overlay{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(21,21,21,.48)}
+.modal-box{width:min(440px,100%);background:var(--panel);border:1px solid var(--border);border-top:4px solid var(--rh-red);padding:24px 26px;box-shadow:0 18px 48px rgba(0,0,0,.22)}
+.modal-kicker{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--rh-red)}
+.modal-box h2{margin:7px 0 8px;font-size:19px}
+.modal-box p{margin:0;color:var(--ink-muted);font-size:13px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1320px){
+  .exam-grid{grid-template-columns:236px minmax(0,1fr) 292px}
+  .meta-item{padding:0 11px}
+  .instructions-scroll{padding:22px 22px 36px}
+}
+@media (max-width:1100px){
+  .exam-screen{overflow:auto}
+  .exam-grid{grid-template-columns:236px minmax(0,1fr);align-items:start;align-content:start;flex:0 0 auto;height:auto}
+  .nav-panel{position:sticky;top:0;height:calc(100vh - var(--header-height) - 16px);min-height:420px}
+  .instructions-panel{min-height:520px}
+  .instructions-scroll{overflow:visible}
+  .checklist-panel{grid-column:2;height:auto}
+  .checklist-panel>details{height:auto}
+  .check-list{max-height:420px;overflow:auto}
+  .checklist-panel>details>summary{cursor:pointer}
+  .collapse-icon.checklist-icon{display:inline-block}
+}
+@media (max-width:860px){
+  .exam-header{flex-wrap:wrap;gap:10px;padding:10px 14px}
+  .header-meta{order:3;width:100%;margin-left:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--border-soft);padding-top:9px}
+  .header-actions{border-left:0;padding-left:0;margin-left:auto}
+  .meta-item{padding:0 10px}
+  .meta-item:first-child{border-left:0;padding-left:0}
+  .overview-grid{grid-template-columns:1fr}
+  .overview-main{border-right:0;border-bottom:1px solid var(--border-soft)}
+  .exam-grid{grid-template-columns:1fr}
+  .nav-panel{position:static;height:auto;min-height:0}
+  .nav-panel>details{height:auto}
+  .nav-list{max-height:300px;overflow:auto}
+  .nav-panel>details>summary{cursor:pointer}
+  .collapse-icon.nav-icon{display:inline-block}
+  .checklist-panel{grid-column:1}
+  .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .summary-stat:nth-child(2){border-right:0}
+  .summary-stat:nth-child(-n+2){border-bottom:1px solid var(--border-soft)}
+  .screen{padding:14px}
+  .doc-header,.overview-main,.overview-side,.summary-hero{padding:20px}
+  .task-head-row{flex-direction:column;gap:10px}
+  .task-points{text-align:left;border-left:0;border-top:1px solid var(--border-soft);padding:10px 0 0}
+  .task-points strong{display:inline;font-size:16px}
+  .task-points span{display:inline;margin-left:6px}
+}
+@media (max-width:560px){
+  .brand-text .subtitle{display:none}
+  .header-meta{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:10px}
+  .meta-item:nth-child(3){border-left:0;padding-left:0}
+  .timer-value{font-size:17px}
+  .header-actions{width:100%;justify-content:flex-end}
+  .fact-list{grid-template-columns:1fr;column-gap:0}
+  .summary-grid{grid-template-columns:1fr}
+  .summary-stat{border-right:0;border-bottom:1px solid var(--border-soft)}
+  .summary-stat:last-child{border-bottom:0}
+  .summary-actions .btn,.start-box .btn{width:100%}
+  .summary-table th:nth-child(2),.summary-table td:nth-child(2){display:none}
+  .meta-strip{gap:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="exam-header" id="examHeader">
+  <div class="brand-block">
+    <div class="brand-mark" aria-hidden="true">RH</div>
+    <div class="brand-text">
+      <div class="eyebrow">Red Hat Certified Engineer</div>
+      <h1>RHCE EX294</h1>
+      <div class="subtitle">Performance-Based Practice Examination</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-item"><div class="meta-label">Candidate</div><div class="meta-value" id="headerCandidate">—</div></div>
+    <div class="meta-item"><div class="meta-label">Exam duration</div><div class="meta-value">04:00:00</div></div>
+    <div class="meta-item"><div class="meta-label">Time remaining</div><div class="meta-value timer-value" id="timer">04:00:00</div></div>
+    <div class="meta-item"><div class="meta-label">Exam status</div><div class="meta-value"><span class="status-badge is-idle" id="statusBadge"><span class="status-dot"></span><span id="statusText">NOT STARTED</span></span></div></div>
+  </div>
+  <div class="header-actions" id="headerActions"></div>
+</header>
+
+<section class="screen overview-screen" id="screenOverview" aria-labelledby="overviewTitle">
+  <div class="overview">
+    <div class="doc-header">
+      <div class="eyebrow">Examination overview</div>
+      <h2 id="overviewTitle">Red Hat Certified Engineer</h2>
+      <p>Performance-based practice examination for RHCE EX294. Work through seventeen Ansible automation tasks, verify each configuration on the managed nodes, and track your progress in the checklist.</p>
+    </div>
+    <div class="overview-grid">
+      <div class="overview-main">
+        <h3>Examination details</h3>
+        <dl class="fact-list">
+          <div class="fact"><dt>Candidate</dt><dd id="overviewCandidate">—</dd></div>
+          <div class="fact"><dt>Certification</dt><dd>Red Hat Certified Engineer</dd></div>
+          <div class="fact"><dt>Exam code</dt><dd>EX294</dd></div>
+          <div class="fact"><dt>Exam type</dt><dd>Practical examination</dd></div>
+          <div class="fact"><dt>Duration</dt><dd>4 hours</dd></div>
+          <div class="fact"><dt>Number of tasks</dt><dd>17</dd></div>
+          <div class="fact"><dt>Maximum score</dt><dd>300</dd></div>
+          <div class="fact"><dt>Passing score</dt><dd>210</dd></div>
+        </dl>
+        <div class="instructions">
+          <h3>Exam instructions</h3>
+          <ol>
+            <li>Read each task carefully before making changes.</li>
+            <li>Complete the requested configuration on the managed nodes.</li>
+            <li>Verify configurations before moving on.</li>
+            <li>Manage time effectively; the countdown continues while you navigate between tasks.</li>
+            <li>Run the validation script after completing the exam.</li>
+          </ol>
+        </div>
+        <div class="notice-block">This is an independent practice simulator. It is not an official Red Hat examination platform, and the checklist estimate is not an official certification result.</div>
+      </div>
+      <div class="overview-side">
+        <div class="candidate-card">
+          <h3>Candidate record</h3>
+          <div class="name-field" id="nameField">
+            <label class="field-label" for="candidateName">Full name</label>
+            <input id="candidateName" type="text" maxlength="80" autocomplete="name" placeholder="Enter your full name" value="" autofocus>
+            <p class="field-hint" id="nameHint">Enter the candidate's full name. It appears in the exam header and completion summary.</p>
+            <p class="field-error hidden" id="nameError">Enter your full name to begin the examination.</p>
+          </div>
+          <dl class="mini-list">
+            <div><dt>Exam</dt><dd>RHCE EX294</dd></div>
+            <div><dt>Format</dt><dd>Practical / lab</dd></div>
+            <div><dt>Time allowed</dt><dd>04:00:00</dd></div>
+            <div><dt>Tasks</dt><dd>17</dd></div>
+            <div><dt>Pass mark</dt><dd>210 / 300</dd></div>
+          </dl>
+        </div>
+        <div class="start-box">
+          <p>The four-hour countdown begins when you start the examination. Your checklist and remaining time are saved in this browser.</p>
+          <button class="btn btn-primary btn-lg" data-action="start">Start Examination</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen exam-screen hidden" id="screenExam" aria-label="Examination workspace">
+  <div class="review-bar hidden" id="reviewBar">
+    <div><strong>Review mode.</strong> <span>The examination is complete and the checklist is read-only. Restart the practice examination to change responses.</span></div>
+    <div class="review-actions">
+      <button class="btn btn-quiet" data-action="back-to-summary">Back to summary</button>
+      <button class="btn btn-outline-red" data-action="restart">Restart practice</button>
+    </div>
+  </div>
+  <div class="exam-grid">
+    <aside class="panel nav-panel" aria-label="Exam navigation">
+      <details id="navDetails" open>
+        <summary class="panel-head"><span>Exam navigation</span><span class="panel-hint" id="navCount">17 TASKS</span><span class="collapse-icon nav-icon" aria-hidden="true">▾</span></summary>
+        <div class="nav-content" id="navContent"></div>
+      </details>
+    </aside>
+    <main class="panel instructions-panel" id="instructionsPanel" aria-label="Task instructions"></main>
+    <aside class="panel checklist-panel" aria-label="Task checklist">
+      <details id="checklistDetails" open>
+        <summary class="panel-head"><span>Task checklist</span><span class="panel-hint">PROGRESS &amp; POINTS</span><span class="collapse-icon checklist-icon" aria-hidden="true">▾</span></summary>
+        <div class="checklist-content" id="checklistContent"></div>
+      </details>
+    </aside>
+  </div>
+</section>
+
+<section class="screen complete-screen hidden" id="screenComplete" aria-label="Examination summary">
+  <div class="summary" id="summaryContent"></div>
+</section>
+
+<div class="modal-overlay hidden" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-kicker">Confirmation required</div>
+    <h2 id="modalTitle"></h2>
+    <p id="modalMessage"></p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" data-action="modal-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modalConfirm" data-action="modal-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   1. EXAM DATA — original RHCE EX294 task content, unchanged.
+   ============================================================= */
+const tasks = [
+{n:1,title:"Install and configure Ansible",marks:20,desc:"Prepare the Ansible control node, inventory and configuration files.",items:["Install required Ansible packages on workstation.lab.example.com.","Create /home/student/ansible/inventory with controller, dev, test, prod and balancers groups and the specified hosts/IPs.","Make prod a child of webservers in the inventory.","Create ansible.cfg with inventory, roles_path and collections_paths exactly as specified.","Ensure student owns and runs the project files."]},
+{n:2,title:"Configure DNF repositories",marks:20,desc:"Configure the baseos and appstream DNF repositories on every managed node.",items:["Create the baseos repository with the required BaseOS URL and description.","Set gpgcheck=1 and the supplied Red Hat release GPG key.","Enable the baseos repository.","Create the appstream repository with the required AppStream URL and description.","Set gpgcheck=1, the same GPG key, and enabled=1 on appstream.","Run adhoc.yml against all managed nodes."]},
+{n:3,title:"Install Ansible collections",marks:10,desc:"Install the required Ansible collections from the supplied tarballs.",items:["Create /home/student/ansible/collections.","Install ansible.posix from the supplied 1.4.0 tarball into that directory.","Install redhat.rhel_system_roles from the supplied 1.0.0 tarball into that directory.","Verify both collections are discoverable from the project configuration."]},
+{n:4,title:"Install Galaxy roles",marks:10,desc:"Install the balancer and phpinfo Galaxy roles from the supplied tarballs.",items:["Create /home/student/ansible/roles.","Create a Galaxy requirements file/playbook under roles as requested.","Install balancer from the supplied balancer.tar.gz URL.","Install phpinfo from the supplied phpinfo.tar.gz URL.","Verify both role directories are present."]},
+{n:5,title:"Create the offline apache role",marks:15,desc:"Create the offline apache role and apply it to the dev hosts.",items:["Create roles/apache/tasks/main.yml and install httpd.","Ensure httpd is enabled and started.","Create the template.j2 web page with FQDN and default IPv4 address.","Create apache_role.yml and apply the apache role to dev.","Verify the rendered page on servera."]},
+{n:6,title:"Use balancer and phpinfo roles",marks:40,desc:"Use the balancer and phpinfo roles to serve load-balanced content and PHP information.",items:["Create roles.yml and apply balancer role to the balancers group.","Verify http://serverd.lab.example.com returns the servera welcome response during rotation.","Verify repeated requests also return the serverc welcome response (version 1.0).","Apply phpinfo role to webservers.","Verify serverc serves the serverc welcome response and PHP information.","Resolve the task's servera example carefully: servera is in dev, not webservers, in the supplied inventory."]},
+{n:7,title:"Configure time synchronization and SELinux",marks:25,desc:"Apply the RHEL system roles for time synchronization and SELinux on every managed node.",items:["Create timesync.yml using the redhat.rhel_system_roles.timesync role.","Configure NTP server 172.25.254.254 with iburst.","Run timesync.yml on all managed nodes and verify chronyd.","Create selinux.yml using the SELinux system role.","Set SELinux to enforcing and verify runtime and persistent configuration."]},
+{n:8,title:"Install packages in multiple groups",marks:15,desc:"Install packages and package groups in separate plays for the host groups.",items:["Install vsftpd and mariadb-server on dev and test.","Install the RPM Development Tools package group on prod.","Update all packages on dev.","Use a separate play for each requested task.","Run and verify packages.yml."]},
+{n:9,title:"Configure web content and SELinux context",marks:15,desc:"Configure web content and its SELinux file context under /devweb on dev.",items:["Create /devweb owned by group devops.","Set directory mode to 2775 (rwxrwsr-x), including the setgid bit.","Apply the appropriate HTTPD SELinux file context to /devweb and its contents.","Create /devweb/index.html containing Development (exam wording: Developement).","Create /var/www/html/devweb as a symlink to /devweb."]},
+{n:10,title:"Generate the hardware report",marks:25,desc:"Download the template and generate the hardware report at /root/hwreport.txt.",items:["Create hwreport.yml and download the supplied hwreport.txt template to /root on every node.","Populate HOSTNAME, MEMORY, BIOS and CPU.","Populate DISK_SIZE_VDA and DISK_SIZE_VDB.","Use NONE when a value is unavailable.","Verify every key=value line on all managed nodes."]},
+{n:11,title:"Configure /etc/issue",marks:10,desc:"Apply group-specific login banners through /etc/issue.",items:["Set /etc/issue to Development on dev.","Set /etc/issue to Test on test.","Set /etc/issue to Production on prod.","Run issue.yml against all managed nodes."]},
+{n:12,title:"Generate /etc/myhosts",marks:15,desc:"Generate /etc/myhosts from a template containing all managed-node details.",items:["Download myhosts.j2 into the project.","Preserve the two supplied localhost lines.","Render IP address, FQDN and short hostname for all four managed nodes.","Write the result to /etc/myhosts on the target(s).","Check the expected 172.25.250.10–13 mappings; note these differ from the inventory's 10.0.20.2–5 addresses."]},
+{n:13,title:"Encrypt vault variables",marks:10,desc:"Create and encrypt vault variables and protect the vault password.",items:["Create vault.yml with pw_developer=lamdev and pw_manager=lammgr.","Encrypt vault.yml using ansible-vault and password P@sswOrd.","Store the vault password in secret.txt with restrictive permissions.","Verify ansible-vault view works using secret.txt."]},
+{n:14,title:"Create users from variable files",marks:25,desc:"Create users from variable files with SHA-512 password hashes.",items:["Download user_list.yml and create users.yml using both variable files.","Create opsdev and add developer-job users on dev and test.","Set developer user passwords from pw_developer using SHA-512 hashes.","Create opsmgr and add manager-job users on test only.","Use a when condition in each play and verify users, groups and shadow hash format."]},
+{n:15,title:"Rekey the supplied vault file",marks:10,desc:"Rekey the supplied vault file from cisco to redhat.",items:["Download or locate solaris.yml in the project directory.","Rekey the vault from old password cisco to new password redhat.","Verify it decrypts with redhat and no longer decrypts with cisco."]},
+{n:16,title:"Create the cron job",marks:10,desc:"Create a cron job for student that runs every two minutes.",items:["Create crontab.yml and run it on all managed nodes.","Create a cron entry for user student.","Schedule every 2 minutes.","Run logger with the exact message EX294 in progress."]},
+{n:17,title:"Create the LVM logical volume",marks:25,desc:"Create the research/data logical volume with a preferred and fallback size.",items:["Create lvm.yml and target all managed nodes.","If VG research is absent, emit the debug message vg not found.","Attempt a 1500M logical volume named data; if unavailable, create at least 800M and emit Insufficient size of vg.","Format the logical volume with ext3.","Do not mount the logical volume; verify no mountpoint is configured."]}
+];
+
+/* =============================================================
+   2. CONSTANTS AND DOM HELPERS
+   ============================================================= */
+const STORAGE_KEY = 'rhce-ex294-progress-v1';
+const CANDIDATE = '';
+const EXAM_SECONDS = 4 * 60 * 60;
+const TOTAL_MARKS = 300;
+const PASS_MARK = 210;
+const $ = selector => document.querySelector(selector);
+const pad2 = value => String(value).padStart(2, '0');
+
+/* =============================================================
+   3. PERSISTENT STATE (same storage key and shape as the original)
+   ============================================================= */
+function loadState(){
+  let raw = {};
+  try { raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (error) { raw = {}; }
+
+  const checked = {};
+  Object.keys(raw.checked || {}).forEach(key => {
+    const n = Number(key);
+    if (!Number.isInteger(n) || n < 1 || n > tasks.length) return;
+    const values = Array.isArray(raw.checked[key]) ? raw.checked[key] : [];
+    checked[n] = [...new Set(values.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < tasks[n - 1].items.length))];
+  });
+
+  let seconds = Number(raw.seconds);
+  if (!Number.isFinite(seconds)) seconds = EXAM_SECONDS;
+  seconds = Math.max(0, Math.min(EXAM_SECONDS, Math.floor(seconds)));
+
+  let last = Number(raw.last);
+  if (!Number.isFinite(last) || last <= 0) last = null;
+
+  let phase = raw.phase;
+  if (!['overview', 'exam', 'complete'].includes(phase)) {
+    const anyChecked = Object.values(checked).some(list => list.length > 0);
+    phase = (anyChecked || raw.running || seconds < EXAM_SECONDS) ? 'exam' : 'overview';
+  }
+  if (seconds === 0) phase = 'complete';
+
+  let current = Number(raw.current);
+  if (!Number.isInteger(current) || current < 1 || current > tasks.length) current = 1;
+
+  return {
+    checked,
+    seconds,
+    running: Boolean(raw.running) && phase === 'exam' && seconds > 0,
+    last: phase === 'exam' && raw.running ? last : null,
+    phase,
+    current,
+    candidate: raw.candidate === undefined ? CANDIDATE : String(raw.candidate).trim().slice(0, 80),
+    completedAt: raw.completedAt || null
+  };
+}
+
+let state = loadState();
+const ui = { filter: 'all', search: '', review: false, confirmAction: null, previousFocus: null };
+
+function save(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (error) { /* storage may be unavailable */ }
+}
+
+function checkedOf(n){ return state.checked[n] || []; }
+function taskDone(n){ return checkedOf(n).length === tasks[n - 1].items.length; }
+function taskState(n){
+  const count = checkedOf(n).length;
+  return count === 0 ? 'not-started' : (count === tasks[n - 1].items.length ? 'completed' : 'in-progress');
+}
+function stateLabel(status){
+  return status === 'completed' ? 'Completed' : status === 'in-progress' ? 'In progress' : 'Not started';
+}
+function stateMarkup(status){
+  if (status === 'completed') return '<i class="state-mark done" aria-hidden="true">✓</i>';
+  return '<i class="state-mark ' + (status === 'in-progress' ? 'progress' : '') + '" aria-hidden="true"></i>';
+}
+
+function taskStats(n){
+  const task = tasks[n - 1];
+  const count = checkedOf(n).length;
+  return {
+    count,
+    total: task.items.length,
+    percent: Math.round(count / task.items.length * 100),
+    earned: task.marks * count / task.items.length
+  };
+}
+function overallStats(){
+  let doneTasks = 0, checkedItems = 0, totalItems = 0, score = 0;
+  tasks.forEach(task => {
+    const count = checkedOf(task.n).length;
+    if (count === task.items.length) doneTasks += 1;
+    checkedItems += count;
+    totalItems += task.items.length;
+    score += task.marks * count / task.items.length;
+  });
+  return {
+    doneTasks,
+    checkedItems,
+    totalItems,
+    score,
+    displayedScore: Math.round(score),
+    passing: score >= PASS_MARK,
+    percent: totalItems ? Math.round(checkedItems / totalItems * 100) : 0,
+    taskPercent: Math.round(doneTasks / tasks.length * 100)
+  };
+}
+
+/* =============================================================
+   4. TEXT AND TIMER HELPERS
+   ============================================================= */
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+
+/* Converts paths, hostnames, values and key=value pairs into monospace
+   markup without changing the task wording. */
+const TOKEN_RE = /(https?:\/\/[^\s,;)]+|(?<![\w])\/(?:[\w.@+-]+\/)*[\w.@+-]+|\b[\w.@+-]+(?:\/[\w.@+-]+)*\.(?:yml|yaml|j2|txt|cfg|sh|tar\.gz)\b|\b[\w.-]+\.lab\.example\.com\b|\b\d{1,3}(?:\.\d{1,3}){2,3}(?:[–-]\d{1,3})?\b|\b[A-Za-z_][A-Za-z0-9_]*=[^\s,;)]+|\b(?:P@sswOrd|SHA-512|ext3|NONE|iburst|enforcing|chronyd|ansible-vault|ansible-inventory|logger|when|key=value|roles_path|collections_paths|inventory|gpgcheck|enabled|HOSTNAME|MEMORY|BIOS|CPU|DISK_SIZE_VDA|DISK_SIZE_VDB|pw_developer|pw_manager|servera|serverb|serverc|serverd|webservers|balancers|prod|dev|test|Developement|1500M|800M|2775|1\.4\.0|1\.0\.0)\b)/g;
+function formatInstruction(text){
+  return escapeHtml(text).replace(TOKEN_RE, token => '<code>' + token + '</code>');
+}
+function referenceTokens(text){
+  const matches = String(text).match(TOKEN_RE) || [];
+  return [...new Set(matches)].slice(0, 12);
+}
+
+function formatTime(seconds){
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor(seconds % 3600 / 60);
+  const s = seconds % 60;
+  return [h, m, s].map(pad2).join(':');
+}
+function updateTimer(){
+  const timer = $('#timer');
+  if (!timer) return;
+  timer.textContent = formatTime(state.seconds);
+  timer.className = 'meta-value timer-value' + (state.seconds <= 300 ? ' danger' : state.seconds <= 1800 ? ' warn' : '');
+}
+function tick(){
+  if (state.running) {
+    const elapsed = state.last ? Math.floor((Date.now() - state.last) / 1000) : 0;
+    if (elapsed > 0) {
+      state.seconds = Math.max(0, state.seconds - elapsed);
+      state.last = state.last + elapsed * 1000;
+      save();
+    }
+    if (state.seconds === 0) {
+      state.running = false;
+      state.last = null;
+      state.phase = 'complete';
+      state.completedAt = Date.now();
+      ui.review = false;
+      ui.filter = 'all';
+      save();
+      renderAll();
+      return;
+    }
+  }
+  updateTimer();
+}
+
+/* =============================================================
+   5. RENDERERS
+   ============================================================= */
+function showingExam(){ return state.phase === 'exam' || (state.phase === 'complete' && ui.review); }
+function isReadOnly(){ return state.phase === 'complete'; }
+
+function renderScreens(){
+  $('#screenOverview').classList.toggle('hidden', state.phase !== 'overview');
+  $('#screenExam').classList.toggle('hidden', !showingExam());
+  $('#screenComplete').classList.toggle('hidden', !(state.phase === 'complete' && !ui.review));
+  $('#reviewBar').classList.toggle('hidden', !(state.phase === 'complete' && ui.review));
+}
+
+function renderCandidate(){
+  const input = $('#candidateName');
+  if (input && document.activeElement !== input) input.value = state.candidate;
+  const overview = $('#overviewCandidate');
+  if (overview) overview.textContent = state.candidate || '—';
+  const header = $('#headerCandidate');
+  if (header) header.textContent = state.candidate || '—';
+}
+
+function renderHeader(){
+  let status = 'NOT STARTED';
+  let badgeClass = 'status-badge is-idle';
+  if (state.phase === 'exam') {
+    status = state.running ? 'IN PROGRESS' : 'PAUSED';
+    badgeClass = state.running ? 'status-badge' : 'status-badge is-paused';
+  } else if (state.phase === 'complete') {
+    status = ui.review ? 'COMPLETED · REVIEW' : 'COMPLETED';
+    badgeClass = 'status-badge is-done';
+  }
+  $('#statusText').textContent = status;
+  $('#statusBadge').className = badgeClass;
+
+  if (state.phase === 'exam') {
+    $('#headerActions').innerHTML =
+      '<button class="btn btn-quiet" data-action="toggle-timer">' + (state.running ? 'Pause' : 'Resume') + '</button>' +
+      '<button class="btn btn-quiet" data-action="reset-timer">Reset</button>' +
+      '<button class="btn btn-outline-red" data-action="end-exam">End Exam</button>';
+  } else if (state.phase === 'complete' && ui.review) {
+    $('#headerActions').innerHTML = '<button class="btn btn-quiet" data-action="back-to-summary">Back to Summary</button>';
+  } else {
+    $('#headerActions').innerHTML = '';
+  }
+}
+
+function visibleTasks(){
+  const query = ui.search.trim().toLowerCase();
+  return tasks.filter(task => {
+    const matchesStatus = ui.filter === 'all' || (ui.filter === 'done' ? taskDone(task.n) : !taskDone(task.n));
+    const haystack = (task.title + ' ' + task.desc + ' ' + task.items.join(' ')).toLowerCase();
+    return matchesStatus && (!query || haystack.includes(query));
+  });
+}
+
+function renderNav(){
+  const list = visibleTasks();
+  $('#navCount').textContent = list.length + (list.length === 1 ? ' TASK' : ' TASKS');
+  $('#navContent').innerHTML =
+    '<div class="nav-tools">' +
+      '<input class="search-input" id="taskSearch" type="search" placeholder="Search tasks or requirements…" value="' + escapeHtml(ui.search) + '" aria-label="Search tasks">' +
+      '<div class="filter-row">' +
+        ['all:All', 'todo:To do', 'done:Completed'].map(pair => {
+          const [value, label] = pair.split(':');
+          return '<button class="filter-chip' + (ui.filter === value ? ' active' : '') + '" data-filter="' + value + '">' + label + '</button>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+    '<div class="nav-list">' + (list.length ? list.map(task => {
+      const status = taskState(task.n);
+      const count = checkedOf(task.n).length;
+      return '<button class="nav-item' + (state.current === task.n ? ' current' : '') + '" data-task="' + task.n + '"' + (state.current === task.n ? ' aria-current="true"' : '') + '>' +
+        '<span class="nav-num">' + pad2(task.n) + '</span>' +
+        '<span class="nav-main"><span class="nav-title">' + stateMarkup(status) + escapeHtml(task.title) + '</span>' +
+        '<span class="nav-sub">' + stateLabel(status) + ' · ' + count + '/' + task.items.length + ' requirements</span></span>' +
+        '<span class="nav-points">' + task.marks + ' pts</span>' +
+      '</button>';
+    }).join('') : '<div class="nav-footnote">No tasks match this view.</div>') + '</div>' +
+    '<div class="nav-footer">' +
+      '<div class="progress-label"><span>Overall progress</span><strong>' + overallStats().doneTasks + ' / ' + tasks.length + ' tasks</strong></div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + overallStats().taskPercent + '%"></div></div>' +
+      '<div class="nav-footnote">' + overallStats().checkedItems + ' of ' + overallStats().totalItems + ' requirements checked · ' + overallStats().percent + '% complete</div>' +
+    '</div>';
+}
+
+function renderTask(){
+  const task = tasks[state.current - 1];
+  const status = taskState(task.n);
+  const ts = taskStats(task.n);
+  const checked = checkedOf(task.n);
+  const tokens = referenceTokens(task.items.join(' '));
+
+  $('#instructionsPanel').innerHTML =
+    '<div class="instructions-scroll" id="instructionsScroll">' +
+      (isReadOnly() ? '<div class="review-note">Review mode: this task is shown for verification only. Checklist responses are read-only.</div>' : '') +
+      '<div class="task-head-row">' +
+        '<div><div class="task-kicker">Task ' + pad2(task.n) + ' of ' + tasks.length + ' · ' + stateLabel(status).toUpperCase() + '</div>' +
+        '<h2 class="task-title">' + escapeHtml(task.title) + '</h2></div>' +
+        '<div class="task-points"><strong>' + task.marks + '</strong><span>points</span></div>' +
+      '</div>' +
+      '<section class="task-overview" aria-label="Task overview">' +
+        '<div class="eyebrow">Task overview</div>' +
+        '<p>' + escapeHtml(task.desc) + '</p>' +
+      '</section>' +
+      '<div class="meta-strip">' +
+        '<div><span>Maximum points</span><strong>' + task.marks + '</strong></div>' +
+        '<div><span>Requirements</span><strong id="centerRequirementCount">' + ts.count + ' of ' + ts.total + ' checked</strong></div>' +
+        '<div><span>Estimated earned</span><strong id="centerEarned">' + ts.earned.toFixed(1) + ' pts</strong></div>' +
+        '<div><span>Status</span><strong>' + stateLabel(status) + '</strong></div>' +
+      '</div>' +
+      '<h3 class="section-title">Detailed requirements</h3>' +
+      '<ol class="requirement-list">' + task.items.map((item, i) =>
+        '<li class="requirement' + (checked.includes(i) ? ' checked' : '') + '">' +
+          '<span class="req-index">' + pad2(i + 1) + '</span>' +
+          '<span class="req-body">' + formatInstruction(item) + '</span>' +
+          (checked.includes(i) ? '<span class="req-check" aria-label="Checked">✓</span>' : '<span></span>') +
+        '</li>'
+      ).join('') + '</ol>' +
+      (tokens.length ? '<details class="ref-details"><summary>Key values and paths used in this task</summary><pre class="reference-block">' + escapeHtml(tokens.join('\n')) + '</pre></details>' : '') +
+      '<h3 class="section-title">Notes</h3>' +
+      '<div class="notes-stack">' +
+        '<div class="notice-block"><strong>Verify before marking.</strong> Use the checklist on the right to record each requirement only after confirming it on the managed nodes.</div>' +
+        '<div class="notice-block neutral">Independent practice simulator. Run the companion validation script after completing the exam to check the actual lab state; the checklist is an estimate only.</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderChecklist(){
+  const task = tasks[state.current - 1];
+  const ts = taskStats(task.n);
+  const checked = checkedOf(task.n);
+  const readOnly = isReadOnly();
+
+  $('#checklistContent').innerHTML =
+    (readOnly ? '<div class="checklist-readonly">Read-only review. Restart to change responses.</div>' : '') +
+    '<div class="checklist-block">' +
+      '<div class="check-topline"><span class="section-title">Task ' + pad2(task.n) + ' progress</span><span class="points-badge">' + task.marks + ' pts</span></div>' +
+      '<div class="progress-number"><strong id="taskPercent">' + ts.percent + '%</strong><span>complete</span></div>' +
+      '<div class="progress-track"><div class="progress-fill" id="taskBar" style="width:' + ts.percent + '%"></div></div>' +
+      '<div class="check-meta"><span id="taskCheckedCount">' + ts.count + ' of ' + ts.total + ' requirements</span><span id="taskEarned">≈ ' + ts.earned.toFixed(1) + ' pts</span></div>' +
+    '</div>' +
+    '<div class="check-list">' + task.items.map((item, i) =>
+      '<label class="check-item' + (checked.includes(i) ? ' done' : '') + '" data-row="' + i + '">' +
+        '<input type="checkbox" data-check="' + task.n + '" data-i="' + i + '"' + (checked.includes(i) ? ' checked' : '') + (readOnly ? ' disabled' : '') + '>' +
+        '<span class="check-index">' + pad2(i + 1) + '</span>' +
+        '<span class="check-text">' + formatInstruction(item) + '</span>' +
+      '</label>'
+    ).join('') + '</div>' +
+    '<div class="check-nav">' +
+      '<button class="btn btn-secondary" data-action="prev"' + (task.n === 1 ? ' disabled' : '') + '>← Previous</button>' +
+      '<button class="btn btn-secondary" data-action="next"' + (task.n === tasks.length ? ' disabled' : '') + '>Next →</button>' +
+    '</div>';
+}
+
+function renderSummary(){
+  const s = overallStats();
+  const rows = tasks.map(item => {
+    const status = taskState(item.n);
+    return '<tr><td>' + pad2(item.n) + '</td><td>' + escapeHtml(item.title) + '</td><td>' + item.marks + '</td><td>' + stateLabel(status) + '</td></tr>';
+  }).join('');
+
+  $('#summaryContent').innerHTML =
+    '<div class="summary-hero' + (s.passing ? ' is-pass' : '') + '">' +
+      '<div class="eyebrow" style="color:var(--rh-red)">Examination summary</div>' +
+      '<h2 id="summaryTitle">Practice examination complete</h2>' +
+      '<p>Candidate: <strong>' + escapeHtml(state.candidate || '—') + '</strong> · RHCE EX294 · Performance-based practice examination</p>' +
+      '<div class="result-line"><span>Estimated result</span><strong>' + (s.passing ? 'PASS' : 'NOT YET PASSED') + '</strong></div>' +
+    '</div>' +
+    '<div class="summary-grid">' +
+      '<div class="summary-stat"><span>Tasks completed</span><strong>' + s.doneTasks + ' / ' + tasks.length + '</strong></div>' +
+      '<div class="summary-stat"><span>Overall completion</span><strong>' + s.percent + '%</strong></div>' +
+      '<div class="summary-stat"><span>Estimated score</span><strong>' + s.displayedScore + ' / ' + TOTAL_MARKS + '</strong></div>' +
+      '<div class="summary-stat"><span>Passing threshold</span><strong>' + PASS_MARK + ' / ' + TOTAL_MARKS + '</strong></div>' +
+    '</div>' +
+    '<div class="notice-block"><strong>Estimate only.</strong> This result is calculated from the simulator checklist and is not an official Red Hat certification result. The companion validation script is authoritative for the technical checks it supports.</div>' +
+    '<div class="summary-actions">' +
+      '<button class="btn btn-secondary" data-action="review-done">Review completed tasks</button>' +
+      '<button class="btn btn-secondary" data-action="review-todo">Review incomplete tasks</button>' +
+      '<button class="btn btn-primary" data-action="restart">Restart practice examination</button>' +
+    '</div>' +
+    '<div class="summary-table-wrap"><h3>Task-by-task result</h3>' +
+      '<table class="summary-table"><thead><tr><th>Task</th><th>Title</th><th>Points</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+    '</div>';
+}
+
+function renderAll(){
+  renderScreens();
+  renderCandidate();
+  renderHeader();
+  updateTimer();
+  if (state.phase === 'complete' && !ui.review) renderSummary();
+  if (showingExam()) {
+    renderNav();
+    renderTask();
+    renderChecklist();
+  }
+}
+
+/* Partial refresh after a checklist change: keeps checkbox focus intact. */
+function refreshAfterCheck(){
+  const ts = taskStats(state.current);
+  const task = tasks[state.current - 1];
+
+  renderNav();
+  renderTask();
+
+  const percent = $('#taskPercent');
+  const bar = $('#taskBar');
+  const count = $('#taskCheckedCount');
+  const earned = $('#taskEarned');
+  if (percent) percent.textContent = ts.percent + '%';
+  if (bar) bar.style.width = ts.percent + '%';
+  if (count) count.textContent = ts.count + ' of ' + ts.total + ' requirements';
+  if (earned) earned.textContent = '≈ ' + ts.earned.toFixed(1) + ' pts';
+
+  document.querySelectorAll('.check-item[data-row]').forEach(row => {
+    row.classList.toggle('done', checkedOf(task.n).includes(Number(row.dataset.row)));
+  });
+}
+
+/* =============================================================
+   6. CONFIRMATION DIALOG
+   ============================================================= */
+function openConfirm(config){
+  ui.confirmAction = config.onConfirm;
+  ui.previousFocus = document.activeElement;
+  $('#modalTitle').textContent = config.title;
+  $('#modalMessage').textContent = config.message;
+  const confirm = $('#modalConfirm');
+  confirm.textContent = config.confirmLabel || 'Confirm';
+  confirm.className = 'btn ' + (config.danger ? 'btn-danger' : 'btn-primary');
+  $('#modal').classList.remove('hidden');
+  confirm.focus();
+}
+function closeConfirm(){
+  $('#modal').classList.add('hidden');
+  ui.confirmAction = null;
+  if (ui.previousFocus && document.contains(ui.previousFocus)) ui.previousFocus.focus();
+  ui.previousFocus = null;
+}
+
+/* =============================================================
+   7. ACTIONS
+   ============================================================= */
+function startExam(){
+  const name = (state.candidate || '').trim();
+  if (!name) {
+    $('#nameField').classList.add('invalid');
+    $('#nameHint').classList.add('hidden');
+    $('#nameError').classList.remove('hidden');
+    $('#candidateName').focus();
+    return;
+  }
+  state.candidate = name;
+  state.phase = 'exam';
+  if (state.seconds > 0) {
+    state.running = true;
+    state.last = Date.now();
+  }
+  save();
+  renderAll();
+  tick();
+}
+function endExam(){
+  openConfirm({
+    title: 'End examination?',
+    message: 'This stops the countdown and displays your practice examination summary. You can review your work afterwards, but the timer will not restart.',
+    confirmLabel: 'End examination',
+    danger: true,
+    onConfirm: () => {
+      state.running = false;
+      state.last = null;
+      state.phase = 'complete';
+      state.completedAt = Date.now();
+      ui.review = false;
+      ui.filter = 'all';
+      save();
+      renderAll();
+    }
+  });
+}
+function restartExam(){
+  openConfirm({
+    title: 'Restart practice examination?',
+    message: 'All checklist progress will be cleared and the four-hour timer will reset to 04:00:00. This cannot be undone.',
+    confirmLabel: 'Restart examination',
+    danger: true,
+    onConfirm: () => {
+      const candidate = state.candidate;
+      state = { checked: {}, seconds: EXAM_SECONDS, running: false, last: null, phase: 'overview', current: 1, candidate, completedAt: null };
+      ui.filter = 'all';
+      ui.search = '';
+      ui.review = false;
+      save();
+      renderAll();
+    }
+  });
+}
+function resetTimer(){
+  openConfirm({
+    title: 'Reset the timer?',
+    message: 'The countdown will return to 04:00:00 and pause. Checklist progress is kept.',
+    confirmLabel: 'Reset timer',
+    onConfirm: () => {
+      state.seconds = EXAM_SECONDS;
+      state.running = false;
+      state.last = null;
+      save();
+      renderHeader();
+      updateTimer();
+    }
+  });
+}
+function toggleTimer(){
+  if (state.running) {
+    tick();
+    state.running = false;
+    state.last = null;
+  } else if (state.seconds > 0) {
+    state.running = true;
+    state.last = Date.now();
+  }
+  save();
+  renderHeader();
+  tick();
+}
+function goToTask(n){
+  if (n < 1 || n > tasks.length) return;
+  state.current = n;
+  save();
+  renderNav();
+  renderTask();
+  renderChecklist();
+  const scroll = $('#instructionsScroll');
+  if (scroll) scroll.scrollTop = 0;
+}
+function enterReview(kind){
+  const candidate = tasks.find(task => kind === 'done' ? taskDone(task.n) : !taskDone(task.n));
+  ui.review = true;
+  ui.filter = kind;
+  ui.search = '';
+  if (candidate) state.current = candidate.n;
+  save();
+  renderAll();
+}
+
+/* =============================================================
+   8. EVENT WIRING
+   ============================================================= */
+document.addEventListener('click', event => {
+  const taskButton = event.target.closest('[data-task]');
+  if (taskButton) { goToTask(Number(taskButton.dataset.task)); return; }
+
+  const filterButton = event.target.closest('[data-filter]');
+  if (filterButton) {
+    ui.filter = filterButton.dataset.filter;
+    renderNav();
+    return;
+  }
+
+  const action = event.target.closest('[data-action]');
+  if (!action) return;
+  switch (action.dataset.action) {
+    case 'start': startExam(); break;
+    case 'toggle-timer': toggleTimer(); break;
+    case 'reset-timer': resetTimer(); break;
+    case 'end-exam': endExam(); break;
+    case 'restart': restartExam(); break;
+    case 'review-done': enterReview('done'); break;
+    case 'review-todo': enterReview('todo'); break;
+    case 'back-to-summary': ui.review = false; ui.filter = 'all'; renderAll(); break;
+    case 'prev': goToTask(state.current - 1); break;
+    case 'next': goToTask(state.current + 1); break;
+    case 'modal-cancel': closeConfirm(); break;
+    case 'modal-confirm': {
+      const callback = ui.confirmAction;
+      closeConfirm();
+      if (callback) callback();
+      break;
+    }
+  }
+});
+
+document.addEventListener('change', event => {
+  const box = event.target;
+  if (!box.matches('[data-check]') || isReadOnly()) return;
+  const n = Number(box.dataset.check);
+  const i = Number(box.dataset.i);
+  const list = new Set(checkedOf(n));
+  if (box.checked) list.add(i); else list.delete(i);
+  state.checked[n] = [...list].sort((a, b) => a - b);
+  if (!state.checked[n].length) delete state.checked[n];
+  save();
+  refreshAfterCheck();
+});
+
+document.addEventListener('input', event => {
+  if (event.target.id === 'candidateName') {
+    state.candidate = event.target.value.slice(0, 80);
+    save();
+    $('#nameField').classList.remove('invalid');
+    $('#nameHint').classList.remove('hidden');
+    $('#nameError').classList.add('hidden');
+    renderCandidate();
+  }
+  if (event.target.id === 'taskSearch') {
+    ui.search = event.target.value;
+    renderNav();
+    const search = $('#taskSearch');
+    if (search) { search.focus(); search.setSelectionRange(search.value.length, search.value.length); }
+  }
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !$('#modal').classList.contains('hidden')) { closeConfirm(); return; }
+  if (event.key === 'Enter' && event.target.id === 'candidateName' && state.phase === 'overview') {
+    event.preventDefault();
+    startExam();
+  }
+});
+
+function syncWideDetails(){
+  if (window.matchMedia('(min-width:861px)').matches) $('#navDetails').open = true;
+  if (window.matchMedia('(min-width:1101px)').matches) $('#checklistDetails').open = true;
+}
+function syncHeaderHeight(){
+  document.documentElement.style.setProperty('--header-height', $('#examHeader').offsetHeight + 'px');
+}
+window.addEventListener('resize', () => { syncWideDetails(); syncHeaderHeight(); });
+
+/* =============================================================
+   9. INITIALISATION
+   ============================================================= */
+tick();
+renderAll();
+syncWideDetails();
+syncHeaderHeight();
+if (state.phase === 'overview') {
+  const nameInput = $('#candidateName');
+  if (nameInput) { nameInput.focus(); nameInput.select(); }
+}
+setInterval(tick, 500);
+</script>
+</body>
+</html>

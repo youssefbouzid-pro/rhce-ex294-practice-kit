@@ -1,0 +1,2 @@
+# Keep the bash validator portable (LF endings) on every platform.
+*.sh text eol=lf
