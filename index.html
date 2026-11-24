@@ -115,6 +115,15 @@ button,input,summary{font:inherit}
 .notice-block.neutral{border-left-color:var(--border);background:var(--panel-alt);color:var(--ink-muted)}
 .overview .notice-block{margin-top:18px}
 
+/* ---------- Candidate entry gate ---------- */
+.entry-screen{overflow:auto;display:grid;place-items:center;padding:28px}
+.entry-card{width:min(560px,100%);background:var(--panel);border:1px solid var(--border);border-top:4px solid var(--rh-red);padding:30px 32px}
+.entry-card h2{margin:8px 0 8px;font-size:25px;letter-spacing:-.02em}
+.entry-card .lead{margin:0;color:var(--ink-muted);font-size:13px;line-height:1.6}
+.entry-card form{margin-top:22px}
+.entry-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.entry-card .notice-block{margin-top:20px}
+
 /* ---------- Exam workspace grid ---------- */
 .exam-grid{display:grid;grid-template-columns:258px minmax(0,1fr) 320px;gap:12px;flex:1;min-height:0}
 details>summary{list-style:none;cursor:default}
@@ -283,7 +292,7 @@ pre.reference-block{margin:0;padding:12px 14px;background:#F7F7F7;border:1px sol
   .summary-stat:nth-child(2){border-right:0}
   .summary-stat:nth-child(-n+2){border-bottom:1px solid var(--border-soft)}
   .screen{padding:14px}
-  .doc-header,.overview-main,.overview-side,.summary-hero{padding:20px}
+  .doc-header,.overview-main,.overview-side,.entry-card,.summary-hero{padding:20px}
   .task-head-row{flex-direction:column;gap:10px}
   .task-points{text-align:left;border-left:0;border-top:1px solid var(--border-soft);padding:10px 0 0}
   .task-points strong{display:inline;font-size:16px}
@@ -325,7 +334,28 @@ pre.reference-block{margin:0;padding:12px 14px;background:#F7F7F7;border:1px sol
   <div class="header-actions" id="headerActions"></div>
 </header>
 
-<section class="screen overview-screen" id="screenOverview" aria-labelledby="overviewTitle">
+<section class="screen entry-screen" id="screenEntry" aria-labelledby="entryTitle">
+  <div class="entry-card">
+    <div class="eyebrow" style="color:var(--rh-red)">Candidate identification</div>
+    <h2 id="entryTitle">Before you begin</h2>
+    <p class="lead">Enter the candidate name for this practice examination. The four-hour countdown starts when you begin the lab.</p>
+    <form id="entryForm" novalidate>
+      <div class="name-field" id="entryField">
+        <label class="field-label" for="entryName">Full name</label>
+        <input id="entryName" type="text" maxlength="80" autocomplete="name" placeholder="Enter your full name">
+        <p class="field-hint" id="entryHint">This name appears in the exam header and completion summary.</p>
+        <p class="field-error hidden" id="entryError">Enter your full name to begin the examination.</p>
+      </div>
+      <div class="entry-actions">
+        <button type="button" class="btn btn-primary btn-lg" id="beginButton" data-action="begin" disabled>Begin Examination</button>
+        <button type="button" class="btn btn-quiet" data-action="show-overview">View exam overview</button>
+      </div>
+    </form>
+    <div class="notice-block">Independent practice simulator. This is not an official Red Hat examination platform.</div>
+  </div>
+</section>
+
+<section class="screen overview-screen hidden" id="screenOverview" aria-labelledby="overviewTitle">
   <div class="overview">
     <div class="doc-header">
       <div class="eyebrow">Examination overview</div>
@@ -345,6 +375,15 @@ pre.reference-block{margin:0;padding:12px 14px;background:#F7F7F7;border:1px sol
           <div class="fact"><dt>Maximum score</dt><dd>300</dd></div>
           <div class="fact"><dt>Passing score</dt><dd>210</dd></div>
         </dl>
+        <h3>Lab environment</h3>
+        <dl class="fact-list">
+          <div class="fact"><dt>Control node</dt><dd>workstation.lab.example.com (user student, password student)</dd></div>
+          <div class="fact"><dt>Managed nodes</dt><dd>servera, serverb, serverc and serverd.lab.example.com</dd></div>
+          <div class="fact"><dt>Remote user</dt><dd>devops on managed nodes; use the control-node user if none is given</dd></div>
+          <div class="fact"><dt>Root password</dt><dd>redhat for all nodes and all users unless stated otherwise</dd></div>
+          <div class="fact"><dt>Project directory</dt><dd>/home/student/ansible (all playbooks, owned and executed by student)</dd></div>
+          <div class="fact"><dt>Automation Platform</dt><dd>Ansible Automation Platform 2.2 at utility.lab.example.com (admin / redhat)</dd></div>
+        </dl>
         <div class="instructions">
           <h3>Exam instructions</h3>
           <ol>
@@ -355,6 +394,7 @@ pre.reference-block{margin:0;padding:12px 14px;background:#F7F7F7;border:1px sol
             <li>Run the validation script after completing the exam.</li>
           </ol>
         </div>
+        <div class="notice-block neutral"><strong>Practice setup (not for exam):</strong> create the <code>research</code> volume group on each managed node before attempting Task 17. The task itself only creates the <code>data</code> logical volume.</div>
         <div class="notice-block">This is an independent practice simulator. It is not an official Red Hat examination platform, and the checklist estimate is not an official certification result.</div>
       </div>
       <div class="overview-side">
@@ -426,26 +466,122 @@ pre.reference-block{margin:0;padding:12px 14px;background:#F7F7F7;border:1px sol
 
 <script>
 /* =============================================================
-   1. EXAM DATA — original RHCE EX294 task content, unchanged.
+   1. EXAM DATA — task content based on the supplied question sheet.
    ============================================================= */
 const tasks = [
-{n:1,title:"Install and configure Ansible",marks:20,desc:"Prepare the Ansible control node, inventory and configuration files.",items:["Install required Ansible packages on workstation.lab.example.com.","Create /home/student/ansible/inventory with controller, dev, test, prod and balancers groups and the specified hosts/IPs.","Make prod a child of webservers in the inventory.","Create ansible.cfg with inventory, roles_path and collections_paths exactly as specified.","Ensure student owns and runs the project files."]},
-{n:2,title:"Configure DNF repositories",marks:20,desc:"Configure the baseos and appstream DNF repositories on every managed node.",items:["Create the baseos repository with the required BaseOS URL and description.","Set gpgcheck=1 and the supplied Red Hat release GPG key.","Enable the baseos repository.","Create the appstream repository with the required AppStream URL and description.","Set gpgcheck=1, the same GPG key, and enabled=1 on appstream.","Run adhoc.yml against all managed nodes."]},
-{n:3,title:"Install Ansible collections",marks:10,desc:"Install the required Ansible collections from the supplied tarballs.",items:["Create /home/student/ansible/collections.","Install ansible.posix from the supplied 1.4.0 tarball into that directory.","Install redhat.rhel_system_roles from the supplied 1.0.0 tarball into that directory.","Verify both collections are discoverable from the project configuration."]},
-{n:4,title:"Install Galaxy roles",marks:10,desc:"Install the balancer and phpinfo Galaxy roles from the supplied tarballs.",items:["Create /home/student/ansible/roles.","Create a Galaxy requirements file/playbook under roles as requested.","Install balancer from the supplied balancer.tar.gz URL.","Install phpinfo from the supplied phpinfo.tar.gz URL.","Verify both role directories are present."]},
-{n:5,title:"Create the offline apache role",marks:15,desc:"Create the offline apache role and apply it to the dev hosts.",items:["Create roles/apache/tasks/main.yml and install httpd.","Ensure httpd is enabled and started.","Create the template.j2 web page with FQDN and default IPv4 address.","Create apache_role.yml and apply the apache role to dev.","Verify the rendered page on servera."]},
-{n:6,title:"Use balancer and phpinfo roles",marks:40,desc:"Use the balancer and phpinfo roles to serve load-balanced content and PHP information.",items:["Create roles.yml and apply balancer role to the balancers group.","Verify http://serverd.lab.example.com returns the servera welcome response during rotation.","Verify repeated requests also return the serverc welcome response (version 1.0).","Apply phpinfo role to webservers.","Verify serverc serves the serverc welcome response and PHP information.","Resolve the task's servera example carefully: servera is in dev, not webservers, in the supplied inventory."]},
-{n:7,title:"Configure time synchronization and SELinux",marks:25,desc:"Apply the RHEL system roles for time synchronization and SELinux on every managed node.",items:["Create timesync.yml using the redhat.rhel_system_roles.timesync role.","Configure NTP server 172.25.254.254 with iburst.","Run timesync.yml on all managed nodes and verify chronyd.","Create selinux.yml using the SELinux system role.","Set SELinux to enforcing and verify runtime and persistent configuration."]},
-{n:8,title:"Install packages in multiple groups",marks:15,desc:"Install packages and package groups in separate plays for the host groups.",items:["Install vsftpd and mariadb-server on dev and test.","Install the RPM Development Tools package group on prod.","Update all packages on dev.","Use a separate play for each requested task.","Run and verify packages.yml."]},
-{n:9,title:"Configure web content and SELinux context",marks:15,desc:"Configure web content and its SELinux file context under /devweb on dev.",items:["Create /devweb owned by group devops.","Set directory mode to 2775 (rwxrwsr-x), including the setgid bit.","Apply the appropriate HTTPD SELinux file context to /devweb and its contents.","Create /devweb/index.html containing Development (exam wording: Developement).","Create /var/www/html/devweb as a symlink to /devweb."]},
-{n:10,title:"Generate the hardware report",marks:25,desc:"Download the template and generate the hardware report at /root/hwreport.txt.",items:["Create hwreport.yml and download the supplied hwreport.txt template to /root on every node.","Populate HOSTNAME, MEMORY, BIOS and CPU.","Populate DISK_SIZE_VDA and DISK_SIZE_VDB.","Use NONE when a value is unavailable.","Verify every key=value line on all managed nodes."]},
-{n:11,title:"Configure /etc/issue",marks:10,desc:"Apply group-specific login banners through /etc/issue.",items:["Set /etc/issue to Development on dev.","Set /etc/issue to Test on test.","Set /etc/issue to Production on prod.","Run issue.yml against all managed nodes."]},
-{n:12,title:"Generate /etc/myhosts",marks:15,desc:"Generate /etc/myhosts from a template containing all managed-node details.",items:["Download myhosts.j2 into the project.","Preserve the two supplied localhost lines.","Render IP address, FQDN and short hostname for all four managed nodes.","Write the result to /etc/myhosts on the target(s).","Check the expected 172.25.250.10–13 mappings; note these differ from the inventory's 10.0.20.2–5 addresses."]},
-{n:13,title:"Encrypt vault variables",marks:10,desc:"Create and encrypt vault variables and protect the vault password.",items:["Create vault.yml with pw_developer=lamdev and pw_manager=lammgr.","Encrypt vault.yml using ansible-vault and password P@sswOrd.","Store the vault password in secret.txt with restrictive permissions.","Verify ansible-vault view works using secret.txt."]},
-{n:14,title:"Create users from variable files",marks:25,desc:"Create users from variable files with SHA-512 password hashes.",items:["Download user_list.yml and create users.yml using both variable files.","Create opsdev and add developer-job users on dev and test.","Set developer user passwords from pw_developer using SHA-512 hashes.","Create opsmgr and add manager-job users on test only.","Use a when condition in each play and verify users, groups and shadow hash format."]},
-{n:15,title:"Rekey the supplied vault file",marks:10,desc:"Rekey the supplied vault file from cisco to redhat.",items:["Download or locate solaris.yml in the project directory.","Rekey the vault from old password cisco to new password redhat.","Verify it decrypts with redhat and no longer decrypts with cisco."]},
-{n:16,title:"Create the cron job",marks:10,desc:"Create a cron job for student that runs every two minutes.",items:["Create crontab.yml and run it on all managed nodes.","Create a cron entry for user student.","Schedule every 2 minutes.","Run logger with the exact message EX294 in progress."]},
-{n:17,title:"Create the LVM logical volume",marks:25,desc:"Create the research/data logical volume with a preferred and fallback size.",items:["Create lvm.yml and target all managed nodes.","If VG research is absent, emit the debug message vg not found.","Attempt a 1500M logical volume named data; if unavailable, create at least 800M and emit Insufficient size of vg.","Format the logical volume with ext3.","Do not mount the logical volume; verify no mountpoint is configured."]}
+{n:1,title:"Install and configure Ansible",marks:20,desc:`Install and configure Ansible on the control node workstation.lab.example.com.`,items:[
+`Install the required Ansible packages on workstation.lab.example.com.`,
+`Create /home/student/ansible and keep every playbook under that directory.`,
+`Create /home/student/ansible/inventory: controller 10.0.20.1; servera.lab.example.com 10.0.20.2 in dev; serverb.lab.example.com 10.0.20.3 in test; serverc.lab.example.com 10.0.20.4 in prod; serverd.lab.example.com 10.0.20.5 in balancers.`,
+`Make prod a member of the webservers host group.`,
+`Create /home/student/ansible/ansible.cfg with the inventory, roles_path=/home/student/ansible/roles and collections_paths=/home/student/ansible/collections.`,
+`Keep project files owned and executed by student; the managed-node user is devops (use the control-node user if none is given) and all other passwords are redhat unless stated otherwise.`
+]},
+{n:2,title:"Configure DNF repositories",marks:20,desc:`Configure the baseos and appstream repositories on every managed node with adhoc.yml.`,items:[
+`Create /home/student/ansible/adhoc.yml and run it against all nodes.`,
+`Configure baseos: description "Baseos Description+", URL http://content/rhel9.0/x86_64/dvd/BaseOS, gpgcheck=1, gpgkey=http://content.example.com/rhel9.0/x86_64/dvd/RPM-GPG-KEY-redhat-release and enabled=1.`,
+`Configure appstream: description "App Description ", URL http://content/rhel9.0/x86_64/dvd/AppStream, gpgcheck=1, the same GPG key and enabled=1.`
+]},
+{n:3,title:"Install Ansible collections",marks:10,desc:`Install the required Ansible collections from the supplied tarballs.`,items:[
+`Create the collections directory /home/student/ansible/collections.`,
+`Install ansible.posix from http://content/Rhce/ansible-posix-1.4.0.tar.gz into the collections directory.`,
+`Install redhat.rhel_system_roles from http://content/Rhce/redhat-rhel_system_roles-1.0.0.tar.gz into the collections directory.`,
+`Verify both collections are discoverable through collections_paths in ansible.cfg.`
+]},
+{n:4,title:"Install Galaxy roles",marks:10,desc:`Install the balancer and phpinfo roles from the supplied tarballs.`,items:[
+`Create the roles directory /home/student/ansible/roles.`,
+`Create a playbook/requirements file named requirements under the roles directory.`,
+`Install the role balancer from http://content.example.com/Rhce/balancer.tar.gz using ansible-galaxy.`,
+`Install the role phpinfo from http://content.example.com/Rhce/phpinfo.tar.gz using ansible-galaxy.`,
+`Verify the balancer and phpinfo role directories exist.`
+]},
+{n:5,title:"Create the offline apache role",marks:15,desc:`Create an offline apache role under roles and apply it to the dev group.`,items:[
+`Create roles/apache/tasks/main.yml and install the httpd package.`,
+`Start and enable the httpd service.`,
+`Host the web page with template.j2 containing "My host is HOSTNAME on IPADDRESS", where HOSTNAME is the fully qualified domain name.`,
+`Create apache_role.yml and run the apache role on the dev group.`,
+`Verify the rendered page on servera.`
+]},
+{n:6,title:"Use balancer and phpinfo roles",marks:40,desc:`Use roles.yml to serve load-balanced and PHP content; the inventory places servera in dev and serverc in prod/webservers.`,items:[
+`Create roles.yml with a play for the balancers group that uses the balancer role.`,
+`Browsing http://serverd.lab.example.com produces "Welcome to servera.lab.example.com, (version 1.0)".`,
+`Refreshing the same URL changes the output to "Welcome to serverc.lab.example.com, (version 1.0)".`,
+`Add a play for the webservers group that uses the phpinfo role.`,
+`http://serverc.lab.example.com shows "Welcome to serverc.lab.example.com, (version 1.0)" together with PHP content.`,
+`The question also cites http://servera.lab.example.com showing "My host is servera.lab.example.com on 172.25.250.10".`
+]},
+{n:7,title:"Configure time synchronization and SELinux",marks:25,desc:`Apply the RHEL system roles for time synchronization and SELinux on all managed nodes.`,items:[
+`Create timesync.yml using the redhat.rhel_system_roles timesync role.`,
+`Use NTP server 172.25.254.254 with iburst enabled.`,
+`Run timesync.yml on all managed nodes and verify chronyd.`,
+`Create selinux.yml using the system role.`,
+`Set SELinux mode to enforcing on all managed nodes.`
+]},
+{n:8,title:"Install packages in multiple groups",marks:15,desc:`Install packages and a package group with a separate play for each task in packages.yml.`,items:[
+`Install vsftpd and mariadb-server in the dev and test groups.`,
+`Install the "RPM Development Tools" group package in the prod group.`,
+`Update all packages in the dev group.`,
+`Use a separate play for each of the three tasks.`
+]},
+{n:9,title:"Configure web content and SELinux context",marks:15,desc:`Configure the /devweb content and its SELinux context on the dev group with webcontent.yml.`,items:[
+`Create the directory /devweb owned by the devops group.`,
+`Give /devweb the context type httpd (use httpd_sys_content_t where the platform requires a concrete type).`,
+`Set permissions user=rwx, group=rwx, others=rx and apply the group special permission (setgid, mode 2775).`,
+`Create /devweb/index.html containing "Developement".`,
+`Link /devweb to /var/www/html/devweb.`
+]},
+{n:10,title:"Generate the hardware report",marks:25,desc:`Generate /root/hwreport.txt on every managed node with hwreport.yml.`,items:[
+`Download http://content.example.com/Rhce/hwreport.txt and save the template as /root/hwreport.txt.`,
+`Populate HOSTNAME, MEMORY, BIOS and CPU with node information in key=value form.`,
+`Populate DISK_SIZE_VDA and DISK_SIZE_VDB.`,
+`Write NONE when information for a key is unavailable.`,
+`Run the playbook on all nodes and verify the six key=value entries.`
+]},
+{n:11,title:"Configure /etc/issue",marks:10,desc:`Apply group-specific login banners with issue.yml on all managed nodes.`,items:[
+`Set /etc/issue on dev to "Developement" as written in the question (the companion validator checks "Development").`,
+`Set /etc/issue on test to "Test".`,
+`Set /etc/issue on prod to "Production".`,
+`Run issue.yml on all managed nodes.`
+]},
+{n:12,title:"Generate /etc/myhosts",marks:15,desc:`Render /etc/myhosts from myhosts.j2 with all managed-node details.`,items:[
+`Download http://content.example.com/Rhce/myhosts.j2.`,
+`Preserve the supplied lines 127.0.0.1 localhost.localdomain localhost and 192.168.0.1 localhost.localdomain localhost.`,
+`Collect the ipaddress, fqdn and hostname of every managed node.`,
+`Store the rendered result in /etc/myhosts on the managed nodes.`,
+`Expect the mappings 172.25.250.10 through 172.25.250.13 for servera through serverd; these differ from the inventory addresses 10.0.20.2 through 10.0.20.5.`
+]},
+{n:13,title:"Encrypt vault variables",marks:10,desc:`Create and encrypt vault.yml and store its password in secret.txt.`,items:[
+`Create vault.yml with pw_developer=lamdev and pw_manager=lammgr.`,
+`Encrypt vault.yml with ansible-vault using the password P@sswOrd.`,
+`Store that password in secret.txt and use it for the encryption.`,
+`Verify the encrypted file can be viewed with secret.txt.`
+]},
+{n:14,title:"Create users from variable files",marks:25,desc:`Create users.yml using user_list.yml and vault.yml with SHA-512 password hashes.`,items:[
+`Download http://content.example.com/Rhce/user_list.yml and use it with vault.yml.`,
+`Create the group opsdev and add users whose job is developer to it on dev and test.`,
+`Set those users' passwords from pw_developer using SHA-512 hashing.`,
+`Create the group opsmgr and add users whose job is manager to it on test.`,
+`Set those users' passwords from pw_manager using SHA-512 hashing.`,
+`Use a when condition in each play and run the playbook on all nodes.`
+]},
+{n:15,title:"Rekey the supplied vault file",marks:10,desc:`Rekey solaris.yml from the old password cisco to the new password redhat.`,items:[
+`Download http://content.example.com/Rhce/solaris.yml into the project.`,
+`Rekey the vault file from cisco to redhat.`,
+`Verify it decrypts with redhat and no longer decrypts with cisco.`
+]},
+{n:16,title:"Create the cron job",marks:10,desc:`Create a cron job for student with crontab.yml on all managed nodes.`,items:[
+`Create /home/student/ansible/crontab.yml and run it on all nodes.`,
+`Create a cron entry for the user student.`,
+`Schedule the job to run every 2 minutes.`,
+`Execute logger "EX294 in progress" as the job command.`
+]},
+{n:17,title:"Create the LVM logical volume",marks:25,desc:`Create the data logical volume from research on all nodes; creating the research volume group itself is practice setup, not an exam requirement.`,items:[
+`Create lvm.yml and run it on all managed nodes.`,
+`If the research volume group does not exist, display the debug message "vg not found".`,
+`Create a 1500M logical volume named data; if that is not possible, create at least 800M and display "Insufficient size of vg".`,
+`Assign the ext3 filesystem to the logical volume.`,
+`Do not mount the logical volume.`
+]}
 ];
 
 /* =============================================================
@@ -482,10 +618,11 @@ function loadState(){
   if (!Number.isFinite(last) || last <= 0) last = null;
 
   let phase = raw.phase;
-  if (!['overview', 'exam', 'complete'].includes(phase)) {
+  if (!['entry', 'overview', 'exam', 'complete'].includes(phase)) {
     const anyChecked = Object.values(checked).some(list => list.length > 0);
-    phase = (anyChecked || raw.running || seconds < EXAM_SECONDS) ? 'exam' : 'overview';
+    phase = (anyChecked || raw.running || seconds < EXAM_SECONDS) ? 'exam' : 'entry';
   }
+  if (phase === 'overview' && !raw.candidate) phase = 'entry';
   if (seconds === 0) phase = 'complete';
 
   let current = Number(raw.current);
@@ -615,6 +752,7 @@ function showingExam(){ return state.phase === 'exam' || (state.phase === 'compl
 function isReadOnly(){ return state.phase === 'complete'; }
 
 function renderScreens(){
+  $('#screenEntry').classList.toggle('hidden', state.phase !== 'entry');
   $('#screenOverview').classList.toggle('hidden', state.phase !== 'overview');
   $('#screenExam').classList.toggle('hidden', !showingExam());
   $('#screenComplete').classList.toggle('hidden', !(state.phase === 'complete' && !ui.review));
@@ -622,12 +760,16 @@ function renderScreens(){
 }
 
 function renderCandidate(){
-  const input = $('#candidateName');
-  if (input && document.activeElement !== input) input.value = state.candidate;
+  ['#candidateName', '#entryName'].forEach(selector => {
+    const input = $(selector);
+    if (input && document.activeElement !== input) input.value = state.candidate;
+  });
   const overview = $('#overviewCandidate');
   if (overview) overview.textContent = state.candidate || '—';
   const header = $('#headerCandidate');
   if (header) header.textContent = state.candidate || '—';
+  const begin = $('#beginButton');
+  if (begin) begin.disabled = !(state.candidate || '').trim();
 }
 
 function renderHeader(){
@@ -853,15 +995,26 @@ function closeConfirm(){
 /* =============================================================
    7. ACTIONS
    ============================================================= */
+function clearNameError(){
+  const targets = state.phase === 'entry'
+    ? ['#entryField', '#entryHint', '#entryError']
+    : ['#nameField', '#nameHint', '#nameError'];
+  $(targets[0])?.classList.remove('invalid');
+  $(targets[1])?.classList.remove('hidden');
+  $(targets[2])?.classList.add('hidden');
+}
+function showNameError(){
+  const targets = state.phase === 'entry'
+    ? ['#entryField', '#entryHint', '#entryError', '#entryName']
+    : ['#nameField', '#nameHint', '#nameError', '#candidateName'];
+  $(targets[0])?.classList.add('invalid');
+  $(targets[1])?.classList.add('hidden');
+  $(targets[2])?.classList.remove('hidden');
+  $(targets[3])?.focus();
+}
 function startExam(){
   const name = (state.candidate || '').trim();
-  if (!name) {
-    $('#nameField').classList.add('invalid');
-    $('#nameHint').classList.add('hidden');
-    $('#nameError').classList.remove('hidden');
-    $('#candidateName').focus();
-    return;
-  }
+  if (!name) { showNameError(); return; }
   state.candidate = name;
   state.phase = 'exam';
   if (state.seconds > 0) {
@@ -898,7 +1051,7 @@ function restartExam(){
     danger: true,
     onConfirm: () => {
       const candidate = state.candidate;
-      state = { checked: {}, seconds: EXAM_SECONDS, running: false, last: null, phase: 'overview', current: 1, candidate, completedAt: null };
+      state = { checked: {}, seconds: EXAM_SECONDS, running: false, last: null, phase: 'entry', current: 1, candidate, completedAt: null };
       ui.filter = 'all';
       ui.search = '';
       ui.review = false;
@@ -973,6 +1126,8 @@ document.addEventListener('click', event => {
   if (!action) return;
   switch (action.dataset.action) {
     case 'start': startExam(); break;
+    case 'begin': startExam(); break;
+    case 'show-overview': state.phase = 'overview'; save(); renderAll(); break;
     case 'toggle-timer': toggleTimer(); break;
     case 'reset-timer': resetTimer(); break;
     case 'end-exam': endExam(); break;
@@ -1006,12 +1161,10 @@ document.addEventListener('change', event => {
 });
 
 document.addEventListener('input', event => {
-  if (event.target.id === 'candidateName') {
+  if (event.target.id === 'candidateName' || event.target.id === 'entryName') {
     state.candidate = event.target.value.slice(0, 80);
     save();
-    $('#nameField').classList.remove('invalid');
-    $('#nameHint').classList.remove('hidden');
-    $('#nameError').classList.add('hidden');
+    clearNameError();
     renderCandidate();
   }
   if (event.target.id === 'taskSearch') {
@@ -1022,9 +1175,11 @@ document.addEventListener('input', event => {
   }
 });
 
+$('#entryForm')?.addEventListener('submit', event => event.preventDefault());
+
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !$('#modal').classList.contains('hidden')) { closeConfirm(); return; }
-  if (event.key === 'Enter' && event.target.id === 'candidateName' && state.phase === 'overview') {
+  if (event.key === 'Enter' && (event.target.id === 'entryName' || event.target.id === 'candidateName')) {
     event.preventDefault();
     startExam();
   }

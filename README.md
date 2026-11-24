@@ -1,7 +1,7 @@
 # RHCE EX294 Practice Kit
 
 This kit contains:
-- `index.html`: browser-based exam dashboard with all 17 tasks, checklist, 4-hour timer, local progress persistence and a weighted estimate.
+- `index.html`: browser-based exam dashboard with all 17 tasks, checklist, 4-hour timer, local progress persistence and a weighted estimate. Task text and key values follow the supplied question sheet; the overview also lists the lab credentials, paths and the practice-only `research` volume-group setup.
 - `rhce-validator.sh`: Bash validation script for the Ansible control node. It grades the lab state out of 300 (pass mark 210) and writes a timestamped report.
 
 ## Web app
@@ -35,6 +35,7 @@ By default the script expects the project at `$HOME/ansible`. The report is save
 7. The hardware report check verifies required keys and non-empty values; it does not enforce a particular memory/disk unit because the task sheet does not specify one.
 8. The LVM check accepts an LV of at least 800 MiB and ext3, and verifies it is not mounted. The debug output itself cannot be proven from final host state; the script checks the messages in `lvm.yml`.
 9. Remote checks assume the inventory groups are named `all`, `dev`, `test`, and `prod`, and that the `balancers` group contains serverd. If your inventory uses a different group layout, update the script.
+10. Task 11's question sheet spells the dev banner `Developement`; the validator currently expects `Development`. The dashboard notes both spellings so the mismatch is visible while practising.
 
 ## Security
 The uploaded sample grader contained a Telegram bot token and chat ID. Treat that token as exposed: revoke/regenerate it with BotFather and do not reuse it. This RHCE validator intentionally does not include Telegram reporting or any embedded credentials.
